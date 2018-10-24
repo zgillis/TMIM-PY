@@ -59,3 +59,21 @@ def getStockPrice(ticker):
         print("Failed to retrieve stock price.")
 
     return price
+
+
+def getRandomDog():
+    # API URL for random dog image
+    URL = "https://dog.ceo/api/breeds/image/random"
+    image = None
+
+    try:
+        print("Getting random dog image...")
+        r = requests.get(URL)
+        data = r.json()
+        image = data['message']
+    except:
+        print("Failed to retrieve random dog image.")
+
+    return image
+
+
