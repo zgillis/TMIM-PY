@@ -7,6 +7,7 @@
 import os
 import time
 import re
+import logging
 from slackclient import SlackClient
 from database import TMIMDatabase
 from config import SLACK_BOT_TOKEN
@@ -60,6 +61,7 @@ def handle_command(command, channel, sender_id, text):
     default_response = """I don't always understand people, but when I do, they don't speak gibberish like you. 
 Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""".format("help")
 
+    logging.info("type=command userid=%s command=%s text=%s" % (sender_id, command.lower(), text))
     # Finds and executes given command, filling in response
     command = command.lower()
     response = None
@@ -147,6 +149,8 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
 
 
 if __name__ == "__main__":
+    logging.basicConfig(filename="botlog.log", level=logging.INFO, format='%(asctime)s %(message)s')
+    logging.info("Logging started")
     if slack_client.rtm_connect(with_team_state=False):
         print("Starter bot connected and running!")
 
