@@ -41,6 +41,7 @@ API Commands:
         *bitcoin/btc* - get the current Bitcoin price in USD
         *stock* _*[ticker]*_ - get the current stock price for a given ticker in USD
         *kss* - get the current stock price of Kohl's (KSS)
+        *dog* - random dog picture
   
 """
 
@@ -176,9 +177,12 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
         else:
             response = "You must guess _*HEADS*_ or _*TAILS*_."
     elif command.startswith("dog"):
-        image_url = "https://images.dog.ceo/breeds/samoyed/n02111889_1402.jpg"
-        attachments = [{"title": "Random Dog", "image_url": image_url}]
-        response = "Here's a random dog."
+        image_url = api_calls.getRandomDog()
+        if image_url is not None:
+            response = "Here's a random dog."
+            attachments = [{"title": "Random Dog", "image_url": image_url}]
+        else:
+            response = "For some reason I was unable to find a random dog picture :("
 
     # Sends response back to channel.
     slack_client.api_call(
