@@ -188,9 +188,9 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
         quote = api_calls.getTrumpQuote()
         if quote is not None:
             attachments = [{
-                "text": "Here's a random quote from Donald Trump.",
+                "pretext": "Here's a random quote from Donald Trump.",
                 "author_name": "Donald J Trump",
-                "pretext": quote,
+                "text": quote,
                 "footer": "The Most Interesting Man in The World Bot",
                 "footer_icon": "https://i.pinimg.com/originals/7c/c7/a6/7cc7a630624d20f7797cb4c8e93c09c1.png"
             }]
