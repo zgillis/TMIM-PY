@@ -176,7 +176,7 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
         else:
             response = "You must guess _*HEADS*_ or _*TAILS*_."
     elif command.startswith("dog"):
-        image_url = "https://dog.ceo/api/breeds/image/random Fetch!"
+        image_url = "https://images.dog.ceo/breeds/samoyed/n02111889_1402.jpg"
         attachments = [{"title": "Random Dog", "image_url": image_url}]
         response = "Here's a random dog."
 
