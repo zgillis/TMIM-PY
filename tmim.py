@@ -8,6 +8,7 @@ import os
 import time
 import re
 import logging
+import random
 from slackclient import SlackClient
 from database import TMIMDatabase
 from config import SLACK_BOT_TOKEN
@@ -34,6 +35,8 @@ User Commands:
         *likes* - see your current like count
         *id* - see your Slack user id
 Feature Commands:
+        *coinflip/flip* _*[heads/tails]*_ - flip a coin
+API Commands:
         *bitcoin/btc* - get the current Bitcoin price in USD
         *stock* _*[ticker]*_ - get the current stock price for a given ticker in USD
         *kss* - get the current stock price of Kohl's (KSS)
@@ -137,6 +140,30 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
         else:
             response = "Just because I climb mountains in my sleep doesn't mean I know what stock you want.\n"
             response += "Proper usage: *stock* _*[ticker]*_"
+    elif command.startswith("coinflip"):
+        strings = text.split(" ")
+        declare = None
+        declare_txt = None
+        flip = random.randint(0, 1)
+        if len(strings) == 3:
+            guess = strings[2].lower()
+            if guess == "heads" or guess == "head" or guess == "h":
+                declare = 0
+                declare_txt = "HEADS"
+            elif guess == "tails" or guess == "tail" or guess == "t":
+                declare = 1
+                declare_txt = "TAILS"
+        if declare is not None:
+            if flip == 0:
+                response = "_It's *HEADS*_. You guessed _*%s*_.\n" % declare_txt
+            else:
+                response = "_It's *TAILS*_. You guessed _*%s*_.\n" % declare_txt
+            if declare == flip:
+                response += "You guessed correctly!"
+            else:
+                response += "You guessed incorrectly.."
+        else:
+            response = "You must guess _*HEADS*_ or _*TAILS*_."
 
 
     # Sends response back to channel.
