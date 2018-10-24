@@ -69,7 +69,7 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
     # Finds and executes given command, filling in response
     command = command.lower()
     response = None
-    image_url = None
+    attachments = None
 
     print(text)
 
@@ -177,6 +177,7 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
             response = "You must guess _*HEADS*_ or _*TAILS*_."
     elif command.startswith("dog"):
         image_url = "https://dog.ceo/api/breeds/image/random Fetch!"
+        attachments = [{"title": "Random Dog", "image_url": image_url}]
         response = "Here's a random dog."
 
     # Sends response back to channel.
@@ -185,7 +186,7 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
         channel=channel,
         as_user=True,
         text=response or default_response,
-        image_url=image_url
+        attachments=attachments
     )
 
 
