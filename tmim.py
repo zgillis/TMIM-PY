@@ -194,6 +194,7 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
                 "footer": "The Most Interesting Man in The World Bot",
                 "footer_icon": "https://i.pinimg.com/originals/7c/c7/a6/7cc7a630624d20f7797cb4c8e93c09c1.png"
             }]
+            response = " "
         else:
             response = "Unable to get a Donald Trump quote."
 
