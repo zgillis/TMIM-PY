@@ -140,7 +140,7 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
         else:
             response = "Just because I climb mountains in my sleep doesn't mean I know what stock you want.\n"
             response += "Proper usage: *stock* _*[ticker]*_"
-    elif command.startswith("coinflip"):
+    elif command.startswith("coinflip") or command.startswith("flip"):
         strings = text.split(" ")
         declare = None
         declare_txt = None
