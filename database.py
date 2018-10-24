@@ -10,6 +10,15 @@ from config import db_config
 class TMIMDatabase:
     con = None
 
+    def db_connect(self):
+        self.con = mysql.connector.connect(
+            host=db_config['host'],
+            user=db_config['user'],
+            passwd=db_config['passwd'],
+            database=db_config['database']
+        )
+        print("Connected to database.")
+
     def __init__(self):
         print("Connecting to database..")
         self.con = mysql.connector.connect(
@@ -19,8 +28,10 @@ class TMIMDatabase:
             database=db_config['database']
         )
         print("Connected to database.")
+        self.con.close()
 
     def get_user(self, user_id):
+        self.db_connect()
         user = None
         cursor = self.con.cursor()
         sql = "SELECT * FROM users WHERE UID = %s"
@@ -28,9 +39,12 @@ class TMIMDatabase:
         rs_user = cursor.fetchone()
         if rs_user is not None:
             user = User(rs_user[0], rs_user[1], rs_user[2], rs_user[3], rs_user[4])
+        cursor.close()
+        self.con.close()
         return user
 
     def get_users(self):
+        self.db_connect()
         cursor = self.con.cursor()
         user_list = []
         sql = "SELECT * FROM users"
@@ -40,16 +54,19 @@ class TMIMDatabase:
         for rs_user in rs:
             user = User(rs_user[0], rs_user[1], rs_user[2], rs_user[3], rs_user[4])
             user_list.append(user)
-
+        cursor.close()
+        self.con.close()
         return user_list
 
     def create_user(self, uid, fn, ln):
+        self.db_connect()
         cursor = self.con.cursor()
         sql = "INSERT INTO users(UID, first_name, last_name) VALUES(%s, %s, %s)"
         cursor.execute(sql, (uid, fn, ln))
         self.con.commit()
         print("New user registered (ID=%s, FIRST=%s, LAST=%s)." % (uid, fn, ln))
-
+        cursor.close()
+        self.con.close()
 
 class User:
     UID = None

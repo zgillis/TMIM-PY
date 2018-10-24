@@ -36,6 +36,7 @@ User Commands:
         *id* - see your Slack user id
 Feature Commands:
         *coinflip/flip* _*[heads/tails]*_ - flip a coin
+        *scoreboard* - see the like count of all users
 API Commands:
         *bitcoin/btc* - get the current Bitcoin price in USD
         *stock* _*[ticker]*_ - get the current stock price for a given ticker in USD
