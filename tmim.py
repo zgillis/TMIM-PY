@@ -79,8 +79,11 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
     elif command.startswith("about"):
         response = "I'm a Slack chatbot written in Python. I don't always crash, but when I do, call Zach."
     elif command.startswith("bitcoin") or command.startswith("btc"):
-        btc_price = api_calls.getBTCPrice()
-        response = "The current price of Bitcoin is $%.2f USD." % btc_price
+        try:
+            btc_price = api_calls.getBTCPrice()
+            response = "The current price of Bitcoin is $%.2f USD." % btc_price
+        except:
+            response = "There was a problem retrieving the Bitcoin price."
     elif command.startswith('id'):
         response = "Your user ID is: %s." % sender_id
     elif command.startswith("me"):
@@ -120,26 +123,32 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
         for user in users:
             response += "\t%s %s:\t%s\n" % (user.first_name, user.last_name, user.like_bal)
     elif command.startswith("kss"):
-        kss_price = api_calls.getKohlsPrice()
-        response = "Kohl's Corporation (NYSE:KSS) current stock price: *$%.2f*" % kss_price
+        try:
+            kss_price = api_calls.getKohlsPrice()
+            response = "Kohl's Corporation (NYSE:KSS) current stock price: *$%.2f*" % kss_price
+        except:
+            response = "There was a problem retrieving the stock price."
     elif command.startswith("stock"):
-        strings = text.split(" ")
-        ticker = None
-        valid = False
-        if len(strings) == 3:
-            ticker = strings[2]
-            if ticker.isalpha():
-                valid = True
-                ticker = ticker.upper()
-        if valid:
-            stock_price = api_calls.getStockPrice(ticker)
-            if stock_price == None:
-                response = "I don't always know the ticker for companies, but this time I know you didn't enter a valid one."
+        try:
+            strings = text.split(" ")
+            ticker = None
+            valid = False
+            if len(strings) == 3:
+                ticker = strings[2]
+                if ticker.isalpha():
+                    valid = True
+                    ticker = ticker.upper()
+            if valid:
+                stock_price = api_calls.getStockPrice(ticker)
+                if stock_price == None:
+                    response = "I was unable to retrieve the stock price for that ticker."
+                else:
+                    response = "Stock price for %s is $%.2f." % (ticker, stock_price)
             else:
-                response = "Stock price for %s is $%.2f." % (ticker, stock_price)
-        else:
-            response = "Just because I climb mountains in my sleep doesn't mean I know what stock you want.\n"
-            response += "Proper usage: *stock* _*[ticker]*_"
+                response = "Just because I climb mountains in my sleep doesn't mean I know what stock you want.\n"
+                response += "Proper usage: *stock* _*[ticker]*_"
+        except:
+            response = "There was a problem retrieving the stock price."
     elif command.startswith("coinflip") or command.startswith("flip"):
         strings = text.split(" ")
         declare = None
