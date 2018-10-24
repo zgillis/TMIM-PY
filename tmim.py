@@ -41,6 +41,8 @@ API Commands:
         *bitcoin/btc* - get the current Bitcoin price in USD
         *stock* _*[ticker]*_ - get the current stock price for a given ticker in USD
         *kss* - get the current stock price of Kohl's (KSS)
+        *dog* - random dog picture
+        *trump* - random quote from Donald Trump
   
 """
 
@@ -69,6 +71,7 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
     # Finds and executes given command, filling in response
     command = command.lower()
     response = None
+    attachments = None
 
     print(text)
 
@@ -174,14 +177,34 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
                 response += "You guessed incorrectly.."
         else:
             response = "You must guess _*HEADS*_ or _*TAILS*_."
-
+    elif command.startswith("dog"):
+        image_url = api_calls.getRandomDog()
+        if image_url is not None:
+            response = "Here's a random dog."
+            attachments = [{"title": "Random Dog", "image_url": image_url}]
+        else:
+            response = "For some reason I was unable to find a random dog picture :("
+    elif command.startswith("trump"):
+        quote = api_calls.getTrumpQuote()
+        if quote is not None:
+            attachments = [{
+                "pretext": "Here's a random quote from Donald Trump.",
+                "author_name": "Donald J Trump",
+                "text": quote,
+                "footer": "The Most Interesting Man in The World Bot",
+                "footer_icon": "https://i.pinimg.com/originals/7c/c7/a6/7cc7a630624d20f7797cb4c8e93c09c1.png"
+            }]
+            response = " "
+        else:
+            response = "Unable to get a Donald Trump quote."
 
     # Sends response back to channel.
     slack_client.api_call(
         "chat.postMessage",
         channel=channel,
         as_user=True,
-        text=response or default_response
+        text=response or default_response,
+        attachments=attachments
     )
 
 
