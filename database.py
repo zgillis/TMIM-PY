@@ -30,10 +30,25 @@ class TMIMDatabase:
             user = User(rs_user[0], rs_user[1], rs_user[2], rs_user[3], rs_user[4])
         return user
 
+    def get_users(self):
+        cursor = self.con.cursor()
+        user_list = []
+        sql = "SELECT * FROM users"
+        cursor.execute(sql)
+        rs = cursor.fetchall()
+
+        for rs_user in rs:
+            user = User(rs_user[0], rs_user[1], rs_user[2], rs_user[3], rs_user[4])
+            user_list.append(user)
+
+        return user_list
+
     def create_user(self, uid, fn, ln):
         cursor = self.con.cursor()
         sql = "INSERT INTO users(UID, first_name, last_name) VALUES(%s, %s, %s)"
-        cursor.execute(sql % (uid, fn, ln))
+        cursor.execute(sql, (uid, fn, ln))
+        self.con.commit()
+        print("New user registered (ID=%s, FIRST=%s, LAST=%s)." % (uid, fn, ln))
 
 
 class User:

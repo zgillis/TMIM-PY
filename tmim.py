@@ -10,7 +10,7 @@ import re
 from slackclient import SlackClient
 from database import TMIMDatabase
 from config import SLACK_BOT_TOKEN
-from api_calls import getBTCPrice
+import api_calls
 
 # Instantiate Slack Client
 slack_client = SlackClient(SLACK_BOT_TOKEN)
@@ -25,12 +25,17 @@ MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 HELP_TEXT = """
 Basic Commands:
         *help* - find a list of commands
-        *me* - see if you are registered
-        *id* - see your Slack user id
         *hello* - say hi to me
-        *about* - learn about this bot  
+        *about* - learn about this bot
+User Commands:
+        *register* _*[first_name]*_ _*[last_name]*_ - register your name and establish like count
+        *me* - see if you are registered, your name and your like count
+        *likes* - see your current like count
+        *id* - see your Slack user id
 Feature Commands:
-        *bitcoin* - get the current Bitcoin price in USD
+        *bitcoin/btc* - get the current Bitcoin price in USD
+        *stock* _*[ticker]*_ - get the current stock price for a given ticker in USD
+        *kss* - get the current stock price of Kohl's (KSS)
   
 """
 
@@ -38,26 +43,28 @@ Feature Commands:
 def parse_bot_commands(slack_events):
     for event in slack_events:
         if event['type'] == "message" and not "subtype" in event:
-            user_id, message = parse_direct_mention(event['text'])
+            user_id, message, text = parse_direct_mention(event['text'])
             if user_id == starterbot_id:
                 sender_id = event['user']
-                return message, sender_id, event['channel']
-    return None, None, None
+                return message, sender_id, event['channel'], text
+    return None, None, None, None
 
 
 def parse_direct_mention(message_text):
     matches = re.search(MENTION_REGEX, message_text)
     # the first group contains the username, the second group contains the remaining message
-    return (matches.group(1), matches.group(2).strip()) if matches else (None, None)
+    return (matches.group(1), matches.group(2).strip(), message_text) if matches else (None, None, None)
 
 
-def handle_command(command, channel, sender_id):
+def handle_command(command, channel, sender_id, text):
     default_response = """I don't always understand people, but when I do, they don't speak gibberish like you. 
 Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""".format("help")
 
     # Finds and executes given command, filling in response
     command = command.lower()
     response = None
+
+    print(text)
 
     # COMMAND HANDLING
     if command.startswith("hi") or command.startswith("hello"):
@@ -67,19 +74,67 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
     elif command.startswith("about"):
         response = "I'm a Slack chatbot written in Python. I don't always crash, but when I do, call Zach."
     elif command.startswith("bitcoin") or command.startswith("btc"):
-        btc_price = getBTCPrice()
+        btc_price = api_calls.getBTCPrice()
         response = "The current price of Bitcoin is $%.2f USD." % btc_price
     elif command.startswith('id'):
         response = "Your user ID is: %s." % sender_id
-    elif command.startswith("register"):
+    elif command.startswith("me"):
         user = db.get_user(sender_id)
         if user is None:
             response = "I don't have you registered yet. Please register with *register [first_name] [last_name]*."
         else:
             response = "Hi, you're %s %s. You have %s likes. Stay thirsty my friend." % (user.first_name, user.last_name, user.like_bal)
     elif command.startswith("register"):
-        response = "Not implemented."
+        strings = text.split(" ")
+        valid = False
+        if len(strings) == 4:
+            first_name = strings[2].capitalize()
+            last_name = strings[3].capitalize()
+            if first_name.isalpha() and last_name.isalpha():
+                valid = True
 
+        if valid:
+            user = db.get_user(sender_id)
+            if user:
+                response = "You are already registered!"
+            else:
+                db.create_user(sender_id, first_name, last_name)
+                response = "You have been registered successfully."
+        else:
+            response = "Just because I climb mountains in my sleep doesn't mean I can register you without your name.\n"
+            response += "Proper usage: *register* _*[first_name]*_ _*[last_name]*_"
+    elif command.startswith("likes"):
+        user = db.get_user(sender_id)
+        if user is None:
+            response = "You must register to have a like count.\nTry *register* _*[first_name]*_ _*[last_name]*_"
+        else:
+            response = "Your like count is *%s*." % user.like_bal
+    elif command.startswith("scoreboard"):
+        response = "Current scoreboard:\n"
+        users = db.get_users()
+        for user in users:
+            response += "\t%s %s:\t%s\n" % (user.first_name, user.last_name, user.like_bal)
+    elif command.startswith("kss"):
+        kss_price = api_calls.getKohlsPrice()
+        response = "Kohl's Corporation (NYSE:KSS) current stock price: *$%.2f*" % kss_price
+    elif command.startswith("stock"):
+        strings = text.split(" ")
+        ticker = None
+        valid = False
+        if len(strings) == 3:
+            ticker = strings[2]
+            if ticker.isalpha():
+                valid = True
+                ticker = ticker.upper()
+        if valid:
+            stock_price = api_calls.getStockPrice(ticker)
+            if stock_price == None:
+                response = "I don't always know the ticker for companies, but this time I know you didn't enter a valid one."
+            else:
+                response = "Stock price for %s is $%.2f." % (ticker, stock_price)
+        else:
+            response = "Just because I climb mountains in my sleep doesn't mean I know what stock you want.\n"
+            response += "Proper usage: *stock* _*[ticker]*_"
 
 
     # Sends response back to channel.
@@ -101,9 +156,9 @@ if __name__ == "__main__":
         db = TMIMDatabase()
 
         while True:
-            command, user_id, channel = parse_bot_commands(slack_client.rtm_read())
+            command, user_id, channel, text = parse_bot_commands(slack_client.rtm_read())
             if command:
-                handle_command(command, channel, user_id)
+                handle_command(command, channel, user_id, text)
             time.sleep(RTM_READ_DELAY)
 
     else:

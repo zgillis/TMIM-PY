@@ -9,7 +9,6 @@ import datetime
 def getBTCPrice():
     # API URL for Bitcoin price
     URL = "https://api.coindesk.com/v1/bpi/currentprice/BTC.json"
-
     price = None
 
     try:
@@ -22,5 +21,41 @@ def getBTCPrice():
 
     except:
         print("Failed to retrieve BTC price.")
+
+    return price
+
+
+def getKohlsPrice():
+    # API URL for Kohls Stock Price
+    URL = "https://api.iextrading.com/1.0/tops/?symbols=KSS"
+    price = None
+
+    try:
+        print("Getting Kohl's stock price...")
+        r = requests.get(URL)
+        data = r.json()
+
+        price = data[0]['lastSalePrice']
+        price = float(price)
+    except:
+        print("Failed to retrieve stock price.")
+
+    return price
+
+
+def getStockPrice(ticker):
+    # API URL for Kohls Stock Price
+    URL = "https://api.iextrading.com/1.0/tops/?symbols=%s" % ticker
+    price = None
+
+    try:
+        print("Getting stock price for %s..." % ticker)
+        r = requests.get(URL)
+        data = r.json()
+        if len(data) > 0:
+            price = data[0]['lastSalePrice']
+            price = float(price)
+    except:
+        print("Failed to retrieve stock price.")
 
     return price
