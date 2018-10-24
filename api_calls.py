@@ -77,3 +77,19 @@ def getRandomDog():
     return image
 
 
+def getTrumpQuote():
+    # API URL for random Trump quote
+    URL = "https://api.whatdoestrumpthink.com/api/v1/quotes/random"
+    quote = None
+
+    try:
+        print("Getting Trump quote...")
+        r = requests.get(URL)
+        data = r.json()
+        quote = data['message']
+    except:
+        pass
+
+    return quote
+
+

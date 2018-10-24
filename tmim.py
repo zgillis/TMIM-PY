@@ -42,6 +42,7 @@ API Commands:
         *stock* _*[ticker]*_ - get the current stock price for a given ticker in USD
         *kss* - get the current stock price of Kohl's (KSS)
         *dog* - random dog picture
+        *trump* - random quote from Donald Trump
   
 """
 
@@ -183,6 +184,18 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
             attachments = [{"title": "Random Dog", "image_url": image_url}]
         else:
             response = "For some reason I was unable to find a random dog picture :("
+    elif command.startswith("trump"):
+        quote = api_calls.getTrumpQuote()
+        if quote is not None:
+            attachments = [{
+                "text": "Here's a random quote from Donald Trump.",
+                "author_name": "Donald J Trump",
+                "pretext": quote,
+                "footer": "The Most Interesting Man in The World Bot",
+                "footer_icon": "https://i.pinimg.com/originals/7c/c7/a6/7cc7a630624d20f7797cb4c8e93c09c1.png"
+            }]
+        else:
+            response = "Unable to get a Donald Trump quote."
 
     # Sends response back to channel.
     slack_client.api_call(
