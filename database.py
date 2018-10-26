@@ -34,11 +34,11 @@ class TMIMDatabase:
         self.db_connect()
         user = None
         cursor = self.con.cursor()
-        sql = "SELECT * FROM users WHERE UID = %s"
+        sql = "SELECT * FROM things WHERE UID = %s"
         cursor.execute(sql, (user_id,))
         rs_user = cursor.fetchone()
         if rs_user is not None:
-            user = User(rs_user[0], rs_user[1], rs_user[2], rs_user[3], rs_user[4])
+            user = User(rs_user[1], rs_user[2], rs_user[2], rs_user[3], rs_user[4])
         cursor.close()
         self.con.close()
         return user
@@ -47,37 +47,35 @@ class TMIMDatabase:
         self.db_connect()
         cursor = self.con.cursor()
         user_list = []
-        sql = "SELECT * FROM users"
+        sql = "SELECT * FROM things"
         cursor.execute(sql)
         rs = cursor.fetchall()
 
         for rs_user in rs:
-            user = User(rs_user[0], rs_user[1], rs_user[2], rs_user[3], rs_user[4])
+            user = User(rs_user[1], rs_user[2], rs_user[3], rs_user[4])
             user_list.append(user)
         cursor.close()
         self.con.close()
         return user_list
 
-    def create_user(self, uid, fn, ln):
+    def create_user(self, uid, nm):
         self.db_connect()
         cursor = self.con.cursor()
-        sql = "INSERT INTO users(UID, first_name, last_name) VALUES(%s, %s, %s)"
-        cursor.execute(sql, (uid, fn, ln))
+        sql = "INSERT INTO things(UID, name) VALUES(%s, %s)"
+        cursor.execute(sql, (uid, nm))
         self.con.commit()
-        print("New user registered (ID=%s, FIRST=%s, LAST=%s)." % (uid, fn, ln))
+        print("New user registered (ID=%s, NAME=%s)." % (uid, nm))
         cursor.close()
         self.con.close()
 
 class User:
     UID = None
-    first_name = None
-    last_name = None
+    name = None
     pwr_lvl = None
     like_bal = None
 
-    def __init__(self, uid, fn, ln, pwr_lvl, like_bal):
+    def __init__(self, uid, nm, pwr_lvl, like_bal):
         self.UID = uid
-        self.first_name = fn
-        self.last_name = ln
+        self.name = nm
         self.pwr_lvl = pwr_lvl
         self.like_bal = like_bal
