@@ -101,7 +101,7 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
         valid = False
         if len(strings) == 4:
             name = strings[2].capitalize()
-            if name.isalpha()
+            if name.isalpha():
                 valid = True
 
         if valid:
