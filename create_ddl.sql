@@ -3,5 +3,7 @@ CREATE TABLE users (
   first_name VARCHAR(25) NOT NULL,
   last_name VARCHAR(25) NOT NULL,
   pwr_lvl INT(5) NOT NULL DEFAULT 1,
-  like_bal INT(10) NOT NULL DEFAULT 0
+  like_bal INT(10) NOT NULL DEFAULT 0,
+  wager_uid CHAR(9),
+  wager_likes INT(10)
 );
