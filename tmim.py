@@ -99,7 +99,7 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
     elif command.startswith("register"):
         strings = text.split(" ")
         valid = False
-        if len(strings) == 4:
+        if len(strings) == 3:
             name = strings[2].capitalize()
             if name.isalpha():
                 valid = True
