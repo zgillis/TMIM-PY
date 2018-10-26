@@ -124,7 +124,7 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
         response = "Current scoreboard:\n"
         users = db.get_users()
         for user in users:
-            response += "\t%s %s:\t%s\n" % (user.name, user.like_bal)
+            response += "\t%s:\t%s\n" % (user.name, user.like_bal)
     elif command.startswith("kss"):
         try:
             kss_price = api_calls.getKohlsPrice()
