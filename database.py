@@ -38,7 +38,7 @@ class TMIMDatabase:
         cursor.execute(sql, (user_id,))
         rs_user = cursor.fetchone()
         if rs_user is not None:
-            user = User(rs_user[1], rs_user[2], rs_user[2], rs_user[3], rs_user[4])
+            user = User(rs_user[1], rs_user[2], rs_user[3], rs_user[4])
         cursor.close()
         self.con.close()
         return user
