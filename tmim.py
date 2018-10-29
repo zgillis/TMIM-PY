@@ -30,7 +30,7 @@ Basic Commands:
         *hello* - say hi to me
         *about* - learn about this bot
 User Commands:
-        *register* _*[first_name]*_ _*[last_name]*_ - register your name and establish like count
+        *register* _*[name]*_ - register your name and establish like count
         *me* - see if you are registered, your name and your like count
         *likes* - see your current like count
         *id* - see your Slack user id
@@ -93,16 +93,15 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
     elif command.startswith("me"):
         user = db.get_user(sender_id)
         if user is None:
-            response = "I don't have you registered yet. Please register with *register [first_name] [last_name]*."
+            response = "I don't have you registered yet. Please register with *register [name]*."
         else:
-            response = "Hi, you're %s %s. You have %s likes. Stay thirsty my friend." % (user.first_name, user.last_name, user.like_bal)
+            response = "Hi, you're %s. You have %s likes. Stay thirsty my friend." % (user.name, user.like_bal)
     elif command.startswith("register"):
         strings = text.split(" ")
         valid = False
-        if len(strings) == 4:
-            first_name = strings[2].capitalize()
-            last_name = strings[3].capitalize()
-            if first_name.isalpha() and last_name.isalpha():
+        if len(strings) == 3:
+            name = strings[2].capitalize()
+            if name.isalpha():
                 valid = True
 
         if valid:
@@ -110,22 +109,22 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
             if user:
                 response = "You are already registered!"
             else:
-                db.create_user(sender_id, first_name, last_name)
+                db.create_user(sender_id, name)
                 response = "You have been registered successfully."
         else:
             response = "Just because I climb mountains in my sleep doesn't mean I can register you without your name.\n"
-            response += "Proper usage: *register* _*[first_name]*_ _*[last_name]*_"
+            response += "Proper usage: *register* _*[name]*_"
     elif command.startswith("likes"):
         user = db.get_user(sender_id)
         if user is None:
-            response = "You must register to have a like count.\nTry *register* _*[first_name]*_ _*[last_name]*_"
+            response = "You must register to have a like count.\nTry *register* _*[name]*_"
         else:
             response = "Your like count is *%s*." % user.like_bal
     elif command.startswith("scoreboard"):
         response = "Current scoreboard:\n"
         users = db.get_users()
         for user in users:
-            response += "\t%s %s:\t%s\n" % (user.first_name, user.last_name, user.like_bal)
+            response += "\t%s:\t%s\n" % (user.name, user.like_bal)
     elif command.startswith("kss"):
         try:
             kss_price = api_calls.getKohlsPrice()
