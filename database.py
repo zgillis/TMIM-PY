@@ -21,13 +21,7 @@ class TMIMDatabase:
 
     def __init__(self):
         print("Connecting to database..")
-        self.con = mysql.connector.connect(
-            host=db_config['host'],
-            user=db_config['user'],
-            passwd=db_config['passwd'],
-            database=db_config['database']
-        )
-        print("Connected to database.")
+        self.db_connect()
         self.con.close()
 
     def get_user(self, user_id):

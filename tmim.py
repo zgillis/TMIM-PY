@@ -91,11 +91,15 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
     elif command.startswith('id'):
         response = "Your user ID is: %s." % sender_id
     elif command.startswith("me"):
-        user = db.get_user(sender_id)
-        if user is None:
-            response = "I don't have you registered yet. Please register with *register [name]*."
-        else:
-            response = "Hi, you're %s. You have %s likes. Stay thirsty my friend." % (user.name, user.like_bal)
+        try:
+            user = db.get_user(sender_id)
+            if user is None:
+                response = "I don't have you registered yet. Please register with *register [name]*."
+            else:
+                response = "Hi, you're %s. You have %s likes. Stay thirsty my friend." % (user.name, user.like_bal)
+        except Exception as e:
+            print(e)
+            response = "There was an error when trying to retrieve your information."
     elif command.startswith("register"):
         strings = text.split(" ")
         valid = False
@@ -105,26 +109,38 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
                 valid = True
 
         if valid:
-            user = db.get_user(sender_id)
-            if user:
-                response = "You are already registered!"
-            else:
-                db.create_user(sender_id, name)
-                response = "You have been registered successfully."
+            try:
+                user = db.get_user(sender_id)
+                if user:
+                    response = "You are already registered!"
+                else:
+                    db.create_user(sender_id, name)
+                    response = "You have been registered successfully."
+            except Exception as e:
+                print(e)
+                response = "There was an error when trying to register you."
         else:
             response = "Just because I climb mountains in my sleep doesn't mean I can register you without your name.\n"
             response += "Proper usage: *register* _*[name]*_"
     elif command.startswith("likes"):
-        user = db.get_user(sender_id)
-        if user is None:
-            response = "You must register to have a like count.\nTry *register* _*[name]*_"
-        else:
-            response = "Your like count is *%s*." % user.like_bal
+        try:
+            user = db.get_user(sender_id)
+            if user is None:
+                response = "You must register to have a like count.\nTry *register* _*[name]*_"
+            else:
+                response = "Your like count is *%s*." % user.like_bal
+        except Exception as e:
+            print(e)
+            response = "There was an error when trying to retrieve your like count."
     elif command.startswith("scoreboard"):
-        response = "Current scoreboard:\n"
-        users = db.get_users()
-        for user in users:
-            response += "\t%s:\t%s\n" % (user.name, user.like_bal)
+        try:
+            response = "Current scoreboard:\n"
+            users = db.get_users()
+            for user in users:
+                response += "\t%s:\t%s\n" % (user.name, user.like_bal)
+        except Exception as e:
+            print(e)
+            response = "There was an error when trying to get the scoreboard."
     elif command.startswith("kss"):
         try:
             kss_price = api_calls.getKohlsPrice()
@@ -216,7 +232,10 @@ if __name__ == "__main__":
         # Read bot's user ID by calling Web API method `auth.test`
         starterbot_id = slack_client.api_call("auth.test")["user_id"]
 
-        db = TMIMDatabase()
+        try:
+            db = TMIMDatabase()
+        except Exception as e:
+            print(e)
 
         while True:
             command, user_id, channel, text = parse_bot_commands(slack_client.rtm_read())
