@@ -22,6 +22,7 @@ starterbot_id = None
 db = None
 
 # Constants
+BOT_VERSION = "1.0"
 RTM_READ_DELAY = 1 # 1-second delay RTM read
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 HELP_TEXT = """
@@ -82,7 +83,8 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
     elif command.startswith("help"):
         response = HELP_TEXT
     elif command.startswith("about"):
-        response = "I'm a Slack chatbot written in Python. I don't always crash, but when I do, call Zach."
+        response = """TMIM-PY: The Most Interesting Man in The World - Python Slack Chatbot (v%s)
+        I'm a Slack chatbot written in Python. I don't always crash, but when I do, call Zach.""" % BOT_VERSION
     elif command.startswith("bitcoin") or command.startswith("btc"):
         try:
             btc_price = api_calls.getBTCPrice()
@@ -253,7 +255,7 @@ if __name__ == "__main__":
     logging.basicConfig(filename="botlog.log", level=logging.INFO, format='%(asctime)s %(message)s')
     logging.info("Logging started")
     if slack_client.rtm_connect(with_team_state=False):
-        print("Starter bot connected and running!")
+        print("\"The Most Interesting Man in The World - Python Slack Chatbot (v%s)\" now running" % BOT_VERSION)
 
         # Read bot's user ID by calling Web API method `auth.test`
         starterbot_id = slack_client.api_call("auth.test")["user_id"]
