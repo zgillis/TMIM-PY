@@ -92,4 +92,22 @@ def getTrumpQuote():
 
     return quote
 
+def getCards(count):
+    URL = "https://deckofcardsapi.com/api/deck/new/draw/?count=%s" % count
+    cards = None
+
+    try:
+        print("Getting %s cards..." % count)
+        r = requests.get(URL)
+        data = r.json()
+        cards = data['cards']
+    except Exception as e:
+        print(e)
+        response = "I had too much Dos Equis and wasn't able to get your cards."
+
+    return cards
+
+
+
+
 

@@ -36,6 +36,7 @@ User Commands:
         *id* - see your Slack user id
 Feature Commands:
         *coinflip/flip* _*[heads/tails]*_ - flip a coin
+        *draw* _*[n]*_ - draw _n_ number of cards (between 1 and 10)
         *scoreboard* - see the like count of all users
 API Commands:
         *bitcoin/btc* - get the current Bitcoin price in USD
@@ -212,6 +213,31 @@ Shotgun a Dos Equis or five and get back to me. Try *{}* to see what I can do.""
             response = " "
         else:
             response = "Unable to get a Donald Trump quote."
+    elif command.startswith("draw"):
+        strings = text.split(" ")
+        try:
+            card_count = int(strings[2])
+            if card_count < 1 or card_count > 10:
+                response = "Try drawing 1 to 10 cards at a time."
+            else:
+                response = "Here's %s random cards..." % str(card_count)
+                cards = api_calls.getCards(card_count)
+                if cards is not None:
+                    attachments = []
+                    for card in cards:
+                        attachments.append({
+                            "title": card['value'] + " of " + card['suit'],
+                            "image_url": card['images']['png']})
+        except Exception as e:
+            response = "I don't always ask how many cards, but when I do, I'm asking for a mah fu'in number 0_0."
+    elif command.startswith("card") or command.startswith("drawone"):
+        response = "Here is a random card."
+        card = api_calls.getCard()
+        if card is not None:
+            attachments = [{
+                "title": card['value'] + " of " + card['suit'],
+                "image_url": card['images']['png']}]
+
 
     # Sends response back to channel.
     slack_client.api_call(
@@ -238,10 +264,20 @@ if __name__ == "__main__":
             print(e)
 
         while True:
-            command, user_id, channel, text = parse_bot_commands(slack_client.rtm_read())
-            if command:
-                handle_command(command, channel, user_id, text)
-            time.sleep(RTM_READ_DELAY)
+            try:
+                command, user_id, channel, text = parse_bot_commands(slack_client.rtm_read())
+                if command:
+                    handle_command(command, channel, user_id, text)
+                time.sleep(RTM_READ_DELAY)
+            except Exception as e:
+                print(e)
+                print("\nRESTARTING BOT LOGIC")
+                if slack_client.rtm_connect(with_team_state=False):
+                    starterbot_id = slack_client.api_call("auth.test")["user_id"]
+                    continue
+                else:
+                    exit(5)
+
 
     else:
         print("Connection failed.")
